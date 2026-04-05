@@ -1,4 +1,4 @@
-# 💰 Finance Tracking System
+#  Finance Tracking System
 
 A clean, well-structured **Python + FastAPI** backend for managing personal financial records with role-based access control, analytics, full CRUD operations, and a **premium frontend dashboard**.
 
@@ -303,18 +303,6 @@ curl "http://localhost:8000/transactions?type=expense&category=food&date_from=20
 
 ---
 
-## Deployment
-
-To deploy this project (e.g., on [Render](https://render.com)):
-
-1. Push the code to a GitHub repository.
-2. On Render, create a **New Web Service** and connect to the repo.
-3. Set these configurations:
-   - **Build Command:** `pip install -r requirements.txt && python seed.py`
-   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port 10000`
-4. Once live, access `https://your-app-url.onrender.com/docs` for Swagger docs, or `/` for the frontend dashboard.
-
----
 
 ## License
 
