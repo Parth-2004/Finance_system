@@ -1,6 +1,6 @@
 # 💰 Finance Tracking System
 
-A clean, well-structured **Python + FastAPI** backend for managing personal financial records with role-based access control, analytics, and full CRUD operations.
+A clean, well-structured **Python + FastAPI** backend for managing personal financial records with role-based access control, analytics, full CRUD operations, and a **premium frontend dashboard**.
 
 ---
 
@@ -14,6 +14,7 @@ A clean, well-structured **Python + FastAPI** backend for managing personal fina
 | Auth         | JWT (python-jose) + bcrypt         |
 | Testing      | Pytest + HTTPX (TestClient)        |
 | API Docs     | Swagger UI (auto-generated)        |
+| Frontend     | Vanilla HTML + CSS + JavaScript    |
 
 ---
 
@@ -21,13 +22,14 @@ A clean, well-structured **Python + FastAPI** backend for managing personal fina
 
 ```
 finance_system/
-├── main.py                     # App entry point, router registration
+├── main.py                     # App entry point, router registration, frontend serving
 ├── config.py                   # App settings (secret key, DB URL, etc.)
 ├── database.py                 # SQLAlchemy engine, session, Base
 ├── dependencies.py             # Auth dependencies & role guards
 ├── seed.py                     # Demo data seeder
 ├── tests.py                    # Unit + integration tests
 ├── requirements.txt
+├── .gitignore
 │
 ├── models/
 │   ├── user.py                 # User model + UserRole enum
@@ -42,36 +44,84 @@ finance_system/
 │   ├── transactions.py         # /transactions/* endpoints
 │   └── analytics.py            # /analytics/* endpoints
 │
-└── services/
-    ├── auth_service.py         # Auth logic: hashing, token, user CRUD
-    ├── transaction_service.py  # Transaction CRUD + filtering
-    └── analytics_service.py    # Summary, category breakdown, monthly totals
+├── services/
+│   ├── auth_service.py         # Auth logic: hashing, token, user CRUD
+│   ├── transaction_service.py  # Transaction CRUD + filtering
+│   └── analytics_service.py    # Summary, category breakdown, monthly totals
+│
+└── static/
+    └── index.html              # Full-featured frontend dashboard (single-page app)
 ```
 
 ---
 
-## Setup & Installation
+## Frontend Dashboard
 
-### 1. Clone and enter the project
+The project includes a **premium single-page frontend application** served directly by FastAPI at the root URL (`/`). The frontend is built with vanilla HTML, CSS, and JavaScript — no build tools required.
+
+### Frontend Features
+
+- **Login & Registration** — Animated login card with demo credentials for quick testing
+- **Dashboard Overview** — Summary stat cards showing total income, expenses, net balance, and transaction count
+- **Transaction Management** — Full table view with pagination, inline editing, and creation modals (Admin only)
+- **Advanced Filtering** — Filter transactions by type, category, and date range
+- **Analytics Page** — Category breakdown with animated progress bars and monthly income vs. expense comparison
+- **User Management** — Admin panel to view, update roles, and delete users
+- **Role-Based UI** — Navigation items and actions are dynamically shown/hidden based on the logged-in user's role
+- **Toast Notifications** — Success, error, and info feedback messages
+- **Responsive Design** — Sidebar navigation, monospace typography (DM Mono), and warm color palette
+
+### Design Details
+
+| Aspect         | Details                                          |
+|----------------|--------------------------------------------------|
+| Typography     | Syne (headings), DM Mono (body), Lora (accents)  |
+| Color Palette  | Warm paper/cream background, gold accents, ink-dark sidebar |
+| Interactions   | Hover effects, slide-up animations, modal overlays with blur |
+| Layout         | Fixed sidebar + scrollable main content area      |
+
+---
+
+## How to Download & Run This Project
+
+### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd finance_system
+git clone https://github.com/Parth-2004/Finance_system.git
+cd Finance_system
 ```
 
 ### 2. Create a virtual environment
 
 ```bash
 python -m venv venv
-source venv/bin/activate        # macOS / Linux
-venv\Scripts\activate           # Windows
 ```
+
+#### Activate it:
+
+- **Windows (PowerShell):**
+  ```powershell
+  .\venv\Scripts\activate
+  ```
+- **Windows (CMD):**
+  ```cmd
+  venv\Scripts\activate
+  ```
+- **macOS / Linux:**
+  ```bash
+  source venv/bin/activate
+  ```
 
 ### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+
+> **Note (Windows):** If you encounter a bcrypt-related error, run:
+> ```bash
+> pip install "bcrypt<4.0.0"
+> ```
 
 ### 4. (Optional) Configure environment
 
@@ -90,24 +140,34 @@ python seed.py
 
 This creates 3 users and 25 sample transactions.
 
+> **Note (Windows):** If you see a Unicode/emoji error, run:
+> ```powershell
+> $env:PYTHONIOENCODING="utf-8"; python seed.py
+> ```
+
 ### 6. Run the server
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Server runs at: **http://localhost:8000**
-Interactive API docs: **http://localhost:8000/docs**
+### 7. Open in your browser
+
+| URL                              | Description                    |
+|----------------------------------|--------------------------------|
+| http://localhost:8000            | Frontend Dashboard (login UI)  |
+| http://localhost:8000/docs       | Swagger API Documentation      |
+| http://localhost:8000/health     | Health check endpoint          |
 
 ---
 
 ## Demo Accounts (after seeding)
 
-| Role     | Email                   | Password    |
-|----------|-------------------------|-------------|
-| Admin    | admin@finance.com       | admin123    |
-| Analyst  | analyst@finance.com     | analyst123  |
-| Viewer   | viewer@finance.com      | viewer123   |
+| Role     | Name   | Email                   | Password    |
+|----------|--------|-------------------------|-------------|
+| Admin    | Parth  | admin@finance.com       | admin123    |
+| Analyst  | Ansh   | analyst@finance.com     | analyst123  |
+| Viewer   | Ram    | viewer@finance.com      | viewer123   |
 
 ---
 
@@ -201,6 +261,8 @@ Tests cover:
 
 7. A user **cannot delete themselves** even as an admin.
 
+8. **Frontend is a single HTML file** — no build step, no npm, no frameworks. It communicates with the backend via `fetch()` calls to the API endpoints.
+
 ---
 
 ## Example Usage (curl)
@@ -238,3 +300,22 @@ curl http://localhost:8000/analytics/summary \
 curl "http://localhost:8000/transactions?type=expense&category=food&date_from=2024-01-01" \
   -H "Authorization: Bearer <token>"
 ```
+
+---
+
+## Deployment
+
+To deploy this project (e.g., on [Render](https://render.com)):
+
+1. Push the code to a GitHub repository.
+2. On Render, create a **New Web Service** and connect to the repo.
+3. Set these configurations:
+   - **Build Command:** `pip install -r requirements.txt && python seed.py`
+   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port 10000`
+4. Once live, access `https://your-app-url.onrender.com/docs` for Swagger docs, or `/` for the frontend dashboard.
+
+---
+
+## License
+
+This project is open-source and available for educational and personal use.
