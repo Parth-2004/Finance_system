@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceOS — Track. Analyse. Control.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink: #0e0e0e;
+  --paper: #f5f2eb;
+  --cream: #ede9df;
+  --gold: #c9a84c;
+  --gold-light: #f0d98a;
+  --rust: #c0522a;
+  --sage: #4a7c5f;
+  --slate: #3d4a5c;
+  --muted: #8a8478;
+  --card: #ffffff;
+  --border: #d8d3c8;
+  --danger: #b83232;
+  --success: #2e7d52;
+  --radius: 12px;
+  --shadow: 0 2px 20px rgba(14,14,14,0.08);
+  --shadow-lg: 0 8px 48px rgba(14,14,14,0.14);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════════ */
+#loginScreen {
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg-text {
+  position: absolute;
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(80px, 15vw, 180px);
+  font-weight: 800;
+  color: rgba(255,255,255,0.03);
+  white-space: nowrap;
+  user-select: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  letter-spacing: -4px;
+}
+
+.login-card {
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 48px;
+  width: 420px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+.login-logo span { color: var(--gold); }
+
+.login-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 36px;
+}
+
+.form-group { margin-bottom: 18px; }
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: var(--radius);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: white;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-primary:hover { background: #2a2a2a; transform: translateY(-1px); }
+
+.btn-gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--ink); background: var(--cream); }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover { background: #9a2020; }
+
+.btn-sm { padding: 8px 14px; font-size: 12px; }
+
+.login-toggle {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.login-toggle a {
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.demo-credentials {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.demo-credentials h4 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.demo-cred-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.demo-cred-item:last-child { border-bottom: none; }
+
+.role-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-admin   { background: #fde8e8; color: var(--danger); }
+.badge-analyst { background: #e8f0fd; color: var(--slate); }
+.badge-viewer  { background: #e8f5ee; color: var(--sage); }
+
+.use-btn {
+  font-size: 11px;
+  color: var(--gold);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  text-decoration: underline;
+}
+
+/* ══════════════════════════════════════════════
+   DASHBOARD LAYOUT
+══════════════════════════════════════════════ */
+#dashScreen {
+  flex-direction: row;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1px;
+  padding: 0 24px 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-logo span { color: var(--gold); }
+
+.sidebar-user {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-user-name {
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.sidebar-user-email {
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 0 24px;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  color: white;
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-item.active {
+  color: white;
+  background: rgba(201,168,76,0.12);
+  border-left-color: var(--gold);
+}
+
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--paper);
+}
+
+.page { display: none; padding: 40px; }
+.page.active { display: block; }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ── STAT CARDS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1.5px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.stat-card.income::before  { background: var(--sage); }
+.stat-card.expense::before { background: var(--rust); }
+.stat-card.balance::before { background: var(--gold); }
+.stat-card.count::before   { background: var(--slate); }
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+}
+
+.stat-value.positive { color: var(--success); }
+.stat-value.negative { color: var(--danger); }
+
+.stat-icon {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 28px;
+  opacity: 0.12;
+}
+
+/* ── CARDS ── */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-body { padding: 24px; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 12px 16px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: var(--cream); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 14px 16px;
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.tx-amount { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px; }
+.tx-income  { color: var(--success); }
+.tx-expense { color: var(--danger); }
+
+.type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.type-income  { background: #e8f5ee; color: var(--success); }
+.type-expense { background: #fde8e8; color: var(--danger); }
+
+.action-btns { display: flex; gap: 6px; }
+
+/* ── FILTERS BAR ── */
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-group label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--cream);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--gold);
+}
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pagination-btns { display: flex; gap: 6px; }
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* ── ANALYTICS ── */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.category-bar {
+  margin-bottom: 14px;
+}
+
+.category-bar-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.category-bar-name { color: var(--ink); text-transform: capitalize; }
+.category-bar-pct  { color: var(--muted); }
+
+.bar-track {
+  height: 8px;
+  background: var(--cream);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+  background: var(--gold);
+}
+
+.bar-fill.income  { background: var(--sage); }
+.bar-fill.expense { background: var(--rust); }
+
+/* Monthly chart */
+.month-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.month-label { width: 60px; color: var(--muted); flex-shrink: 0; }
+
+.month-bars { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+.month-bar-row { display: flex; align-items: center; gap: 8px; }
+
+.month-bar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--cream);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.month-bar-val { width: 80px; text-align: right; font-size: 11px; }
+.month-bar-val.inc { color: var(--success); }
+.month-bar-val.exp { color: var(--danger); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 36px;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.25s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+
+/* ── TOAST ── */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: white;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s ease;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.info    { background: var(--slate); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state h3 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--ink); margin-bottom: 8px; }
+.empty-state p  { font-size: 13px; font-style: italic; font-family: 'Lora', serif; }
+
+/* ── ACCESS DENIED ── */
+.access-denied {
+  text-align: center;
+  padding: 80px 20px;
+}
+.access-denied .lock { font-size: 64px; margin-bottom: 20px; }
+.access-denied h3 { font-family: 'Syne', sans-serif; font-size: 24px; margin-bottom: 10px; }
+.access-denied p { color: var(--muted); font-family: 'Lora', serif; font-style: italic; }
+
+/* ── LOADING ── */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── RECENT TX ── */
+.recent-list { list-style: none; }
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-item:last-child { border-bottom: none; }
+
+.recent-left { display: flex; align-items: center; gap: 12px; }
+
+.recent-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.recent-dot.income  { background: var(--sage); }
+.recent-dot.expense { background: var(--rust); }
+
+.recent-cat { text-transform: capitalize; font-size: 13px; }
+.recent-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.recent-amount { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px; }
+
+/* Users table */
+.user-role-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: var(--cream);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .page { padding: 20px; }
+  .analytics-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  background: var(--cream);
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.net-positive { color: var(--success); font-weight: 600; }
+.net-negative { color: var(--danger); font-weight: 600; }
+
+.info-banner {
+  background: #fffbea;
+  border: 1.5px solid var(--gold-light);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #7a6020;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════ -->
+<div id="loginScreen" class="screen active">
+  <div class="login-bg-text">FINANCE OS</div>
+  <div class="login-card">
+    <div class="login-logo">Finance<span>OS</span></div>
+    <div class="login-subtitle">Your money. Under control.</div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()"/>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()" id="loginBtn">
+        Sign In
+      </button>
+      <div class="login-toggle">
+        Don't have an account? <a onclick="toggleAuthForm('register')">Register here</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="John Doe"/>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password (min 6 characters)</label>
+        <input type="password" id="regPassword" placeholder="••••••••"/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="regRole">
+          <option value="viewer">Viewer — can only view records</option>
+          <option value="analyst">Analyst — can view + analyze data</option>
+          <option value="admin">Admin — full access</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+      <div class="login-toggle">
+        Already have an account? <a onclick="toggleAuthForm('login')">Sign in</a>
+      </div>
+    </div>
+
+    <!-- DEMO CREDENTIALS -->
+    <div class="demo-credentials">
+      <h4>🚀 Demo Accounts — Click to use</h4>
+      <div class="demo-cred-item">
+        <div>
+          <span class="role-badge badge-admin">Admin</span>
+          <span style="margin-left:8px;font-size:12px">admin@finance.com</span>
+        </div>
+        <button class="use-btn" onclick="fillCreds('admin@finance.com','admin123')">Use →</button>
+      </div>
+      <div class="demo-cred-item">
+        <div>
+          <span class="role-badge badge-analyst">Analyst</span>
+          <span style="margin-left:8px;font-size:12px">analyst@finance.com</span>
+        </div>
+        <button class="use-btn" onclick="fillCreds('analyst@finance.com','analyst123')">Use →</button>
+      </div>
+      <div class="demo-cred-item">
+        <div>
+          <span class="role-badge badge-viewer">Viewer</span>
+          <span style="margin-left:8px;font-size:12px">viewer@finance.com</span>
+        </div>
+        <button class="use-btn" onclick="fillCreds('viewer@finance.com','viewer123')">Use →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     DASHBOARD SCREEN
+════════════════════════════════════════ -->
+<div id="dashScreen" class="screen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Finance<span>OS</span></div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-name" id="sidebarName">—</div>
+      <div style="margin:4px 0"><span class="role-badge" id="sidebarRole">—</span></div>
+      <div class="sidebar-user-email" id="sidebarEmail">—</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('overview')">
+        <span class="icon">🏠</span> Dashboard
+      </div>
+      <div class="nav-section-label">Records</div>
+      <div class="nav-item" onclick="showPage('transactions')">
+        <span class="icon">📋</span> Transactions
+      </div>
+      <div class="nav-section-label" id="analyticsLabel">Analytics</div>
+      <div class="nav-item" onclick="showPage('analytics')" id="navAnalytics">
+        <span class="icon">📊</span> Analytics
+      </div>
+      <div class="nav-section-label" id="adminLabel">Admin</div>
+      <div class="nav-item" onclick="showPage('users')" id="navUsers">
+        <span class="icon">👥</span> Manage Users
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">⎋ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- ── OVERVIEW PAGE ── -->
+    <div id="page-overview" class="page active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Good day 👋</div>
+          <div class="page-subtitle" id="overviewSubtitle">Here's your financial snapshot</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card income">
+          <div class="stat-label">Total Income</div>
+          <div class="stat-value positive" id="statIncome">₹0</div>
+          <div class="stat-icon">💰</div>
+        </div>
+        <div class="stat-card expense">
+          <div class="stat-label">Total Expenses</div>
+          <div class="stat-value negative" id="statExpense">₹0</div>
+          <div class="stat-icon">💸</div>
+        </div>
+        <div class="stat-card balance">
+          <div class="stat-label">Current Balance</div>
+          <div class="stat-value" id="statBalance">₹0</div>
+          <div class="stat-icon">⚖️</div>
+        </div>
+        <div class="stat-card count">
+          <div class="stat-label">Total Records</div>
+          <div class="stat-value" id="statCount">0</div>
+          <div class="stat-icon">📁</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('transactions')">View All →</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <ul class="recent-list" id="recentList" style="padding:0 24px">
+            <div class="loading-state">Loading...</div>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRANSACTIONS PAGE ── -->
+    <div id="page-transactions" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Transactions</div>
+          <div class="page-subtitle">All income and expense records</div>
+        </div>
+        <div id="addTxBtn"></div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Type</label>
+          <select id="filterType" onchange="loadTransactions()">
+            <option value="">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <input type="text" id="filterCategory" placeholder="e.g. food" oninput="debounceLoad()"/>
+        </div>
+        <div class="filter-group">
+          <label>From Date</label>
+          <input type="date" id="filterFrom" onchange="loadTransactions()"/>
+        </div>
+        <div class="filter-group">
+          <label>To Date</label>
+          <input type="date" id="filterTo" onchange="loadTransactions()"/>
+        </div>
+        <div class="filter-group" style="justify-content:flex-end;margin-top:auto">
+          <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Records</div>
+          <span id="txCountLabel" style="color:var(--muted);font-size:12px"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Notes</th>
+                <th id="actionHeader"></th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody">
+              <tr><td colspan="7"><div class="loading-state">Loading transactions...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="txPagination" style="display:none">
+          <span id="paginationInfo"></span>
+          <div class="pagination-btns" id="paginationBtns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS PAGE ── -->
+    <div id="page-analytics" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Analytics</div>
+          <div class="page-subtitle">Category breakdowns and monthly trends</div>
+        </div>
+      </div>
+      <div id="analyticsContent"></div>
+    </div>
+
+    <!-- ── USERS PAGE ── -->
+    <div id="page-users" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Manage Users</div>
+          <div class="page-subtitle">Admin-only: view and manage all accounts</div>
+        </div>
+      </div>
+      <div id="usersContent"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODALS
+════════════════════════════════════════ -->
+
+<!-- Add/Edit Transaction Modal -->
+<div class="modal-overlay" id="txModal">
+  <div class="modal">
+    <div class="modal-title" id="txModalTitle">Add Transaction</div>
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" id="txAmount" placeholder="e.g. 5000" min="0.01" step="0.01"/>
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="txType">
+        <option value="income">💰 Income</option>
+        <option value="expense">💸 Expense</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" id="txCategory" placeholder="e.g. salary, food, rent"/>
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="txDate"/>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="txNotes" rows="2" placeholder="Any description..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('txModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveTx()" id="saveTxBtn">Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">⚠️ Confirm Delete</div>
+    <p style="color:var(--muted);font-family:'Lora',serif;font-style:italic;margin-bottom:8px">
+      Are you sure you want to delete this transaction? This action cannot be undone.
+    </p>
+    <div id="deleteDetails" style="padding:16px;background:var(--cream);border-radius:var(--radius);font-size:13px;margin-top:16px"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const API = 'http://localhost:8000';
+let token = localStorage.getItem('fin_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('fin_user') || 'null');
+let currentPage = 1;
+let totalPages = 1;
+let editingTxId = null;
+let deletingTxId = null;
+let debounceTimer = null;
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function fmt(amount) {
+  return '₹' + Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function debounceLoad() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => loadTransactions(), 500);
+}
+
+async function apiFetch(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(API + path, { ...opts, headers });
+  if (res.status === 401) { doLogout(); return null; }
+  return res;
+}
+
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
+function toggleAuthForm(form) {
+  document.getElementById('loginForm').style.display    = form === 'login'    ? '' : 'none';
+  document.getElementById('registerForm').style.display = form === 'register' ? '' : 'none';
+}
+
+function fillCreds(email, pass) {
+  document.getElementById('loginEmail').value    = email;
+  document.getElementById('loginPassword').value = pass;
+  toast('Credentials filled — click Sign In!', 'info');
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+
+  if (!email || !pass) { toast('Please fill in all fields', 'error'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast(data.detail || 'Login failed', 'error');
+    } else {
+      token = data.access_token;
+      currentUser = data.user;
+      localStorage.setItem('fin_token', token);
+      localStorage.setItem('fin_user', JSON.stringify(currentUser));
+      enterDashboard();
+    }
+  } catch(e) {
+    toast('Cannot connect to server. Is it running on port 8000?', 'error');
+  } finally {
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
+  }
+}
+
+async function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass  = document.getElementById('regPassword').value;
+  const role  = document.getElementById('regRole').value;
+
+  if (!name || !email || !pass) { toast('Please fill in all fields', 'error'); return; }
+
+  try {
+    const res = await fetch(API + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password: pass, role })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast(data.detail || 'Registration failed', 'error');
+    } else {
+      toast('Account created! Please sign in.', 'success');
+      toggleAuthForm('login');
+      document.getElementById('loginEmail').value = email;
+    }
+  } catch(e) {
+    toast('Cannot connect to server.', 'error');
+  }
+}
+
+function doLogout() {
+  token = null;
+  currentUser = null;
+  localStorage.removeItem('fin_token');
+  localStorage.removeItem('fin_user');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('dashScreen').classList.remove('active');
+  document.getElementById('loginScreen').style.display = '';
+  document.getElementById('dashScreen').style.display = '';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+/* ══════════════════════════════════════════
+   DASHBOARD SETUP
+══════════════════════════════════════════ */
+function enterDashboard() {
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('dashScreen').classList.add('active');
+
+  // Sidebar
+  document.getElementById('sidebarName').textContent  = currentUser.name;
+  document.getElementById('sidebarEmail').textContent = currentUser.email;
+  const roleEl = document.getElementById('sidebarRole');
+  roleEl.textContent = currentUser.role;
+  roleEl.className = `role-badge badge-${currentUser.role}`;
+
+  // Show/hide nav items based on role
+  const isAnalyst = ['analyst','admin'].includes(currentUser.role);
+  const isAdmin   = currentUser.role === 'admin';
+
+  document.getElementById('navAnalytics').style.display  = isAnalyst ? '' : 'none';
+  document.getElementById('analyticsLabel').style.display = isAnalyst ? '' : 'none';
+  document.getElementById('navUsers').style.display      = isAdmin   ? '' : 'none';
+  document.getElementById('adminLabel').style.display    = isAdmin   ? '' : 'none';
+
+  // Add button for admin
+  document.getElementById('addTxBtn').innerHTML = isAdmin
+    ? `<button class="btn btn-gold" onclick="openAddTx()">＋ Add Transaction</button>`
+    : '';
+
+  document.getElementById('actionHeader').textContent = isAdmin ? 'Actions' : '';
+  document.getElementById('overviewSubtitle').textContent =
+    `Welcome back, ${currentUser.name.split(' ')[0]}. Here's your financial snapshot.`;
+
+  showPage('overview');
+  loadOverview();
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(
+      name === 'overview' ? 'dashboard' :
+      name === 'users' ? 'users' :
+      name === 'analytics' ? 'analytics' : 'transaction'
+    )) n.classList.add('active');
+  });
+
+  if (name === 'transactions') { currentPage = 1; loadTransactions(); }
+  if (name === 'analytics')    loadAnalytics();
+  if (name === 'users')        loadUsers();
+}
+
+/* ══════════════════════════════════════════
+   OVERVIEW
+══════════════════════════════════════════ */
+async function loadOverview() {
+  const res = await apiFetch('/analytics/summary');
+  if (!res || !res.ok) return;
+  const data = await res.json();
+
+  document.getElementById('statIncome').textContent  = fmt(data.total_income);
+  document.getElementById('statExpense').textContent = fmt(data.total_expenses);
+
+  const balEl = document.getElementById('statBalance');
+  balEl.textContent = fmt(data.current_balance);
+  balEl.className   = 'stat-value ' + (data.current_balance >= 0 ? 'positive' : 'negative');
+  document.getElementById('statCount').textContent   = data.total_transactions;
+
+  // Recent list
+  const ul = document.getElementById('recentList');
+  if (!data.recent_transactions.length) {
+    ul.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No records yet</h3><p>Transactions will appear here once added.</p></div>`;
+    return;
+  }
+
+  ul.innerHTML = data.recent_transactions.map(t => `
+    <li class="recent-item">
+      <div class="recent-left">
+        <div class="recent-dot ${t.type}"></div>
+        <div>
+          <div class="recent-cat">${t.category}</div>
+          <div class="recent-date">${fmtDate(t.date)}</div>
+        </div>
+      </div>
+      <div class="recent-amount ${t.type === 'income' ? 'tx-income' : 'tx-expense'}">
+        ${t.type === 'income' ? '+' : '-'}${fmt(t.amount)}
+      </div>
+    </li>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════
+   TRANSACTIONS
+══════════════════════════════════════════ */
+async function loadTransactions() {
+  const type     = document.getElementById('filterType').value;
+  const category = document.getElementById('filterCategory').value.trim();
+  const from     = document.getElementById('filterFrom').value;
+  const to       = document.getElementById('filterTo').value;
+
+  let url = `/transactions?page=${currentPage}&page_size=10`;
+  if (type)     url += `&type=${type}`;
+  if (category) url += `&category=${encodeURIComponent(category)}`;
+  if (from)     url += `&date_from=${from}`;
+  if (to)       url += `&date_to=${to}`;
+
+  const tbody = document.getElementById('txTableBody');
+  tbody.innerHTML = `<tr><td colspan="7"><div class="loading-state">Loading...</div></td></tr>`;
+
+  const res = await apiFetch(url);
+  if (!res) return;
+
+  if (!res.ok) {
+    const err = await res.json();
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error</h3><p>${err.detail}</p></div></td></tr>`;
+    return;
+  }
+
+  const data = await res.json();
+  const isAdmin = currentUser.role === 'admin';
+
+  document.getElementById('txCountLabel').textContent = `${data.total} record${data.total !== 1 ? 's' : ''}`;
+
+  if (!data.items.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><h3>No transactions found</h3><p>Try changing your filters or add a new record.</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = data.items.map(t => `
+      <tr>
+        <td style="color:var(--muted);font-size:12px">#${t.id}</td>
+        <td>${fmtDate(t.date)}</td>
+        <td><span class="type-pill type-${t.type}">${t.type === 'income' ? '💰' : '💸'} ${t.type}</span></td>
+        <td><span class="tag">${t.category}</span></td>
+        <td class="tx-amount ${t.type === 'income' ? 'tx-income' : 'tx-expense'}">
+          ${t.type === 'income' ? '+' : '-'}${fmt(t.amount)}
+        </td>
+        <td style="color:var(--muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          ${t.notes || '—'}
+        </td>
+        <td>
+          ${isAdmin ? `
+            <div class="action-btns">
+              <button class="btn btn-outline btn-sm" onclick="openEditTx(${JSON.stringify(t).replace(/"/g,'&quot;')})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="openDeleteTx(${t.id},'${t.category}',${t.amount},'${t.type}')">Del</button>
+            </div>
+          ` : ''}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Pagination
+  totalPages = Math.ceil(data.total / 10) || 1;
+  const pg = document.getElementById('txPagination');
+  pg.style.display = data.total > 10 ? 'flex' : 'none';
+  document.getElementById('paginationInfo').textContent =
+    `Page ${currentPage} of ${totalPages} (${data.total} total)`;
+
+  const btns = document.getElementById('paginationBtns');
+  btns.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    b.textContent = i;
+    b.onclick = () => { currentPage = i; loadTransactions(); };
+    btns.appendChild(b);
+  }
+}
+
+function clearFilters() {
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterCategory').value = '';
+  document.getElementById('filterFrom').value = '';
+  document.getElementById('filterTo').value = '';
+  currentPage = 1;
+  loadTransactions();
+}
+
+/* ── ADD / EDIT TRANSACTION ── */
+function openAddTx() {
+  editingTxId = null;
+  document.getElementById('txModalTitle').textContent = '＋ Add Transaction';
+  document.getElementById('txAmount').value   = '';
+  document.getElementById('txType').value     = 'income';
+  document.getElementById('txCategory').value = '';
+  document.getElementById('txDate').value     = new Date().toISOString().split('T')[0];
+  document.getElementById('txNotes').value    = '';
+  document.getElementById('saveTxBtn').textContent = 'Save Transaction';
+  showModal('txModal');
+}
+
+function openEditTx(tx) {
+  editingTxId = tx.id;
+  document.getElementById('txModalTitle').textContent = '✏️ Edit Transaction';
+  document.getElementById('txAmount').value   = tx.amount;
+  document.getElementById('txType').value     = tx.type;
+  document.getElementById('txCategory').value = tx.category;
+  document.getElementById('txDate').value     = tx.date;
+  document.getElementById('txNotes').value    = tx.notes || '';
+  document.getElementById('saveTxBtn').textContent = 'Update Transaction';
+  showModal('txModal');
+}
+
+async function saveTx() {
+  const amount   = parseFloat(document.getElementById('txAmount').value);
+  const type     = document.getElementById('txType').value;
+  const category = document.getElementById('txCategory').value.trim();
+  const date     = document.getElementById('txDate').value;
+  const notes    = document.getElementById('txNotes').value.trim();
+
+  if (!amount || amount <= 0) { toast('Amount must be greater than zero', 'error'); return; }
+  if (!category)              { toast('Category is required', 'error'); return; }
+  if (!date)                  { toast('Date is required', 'error'); return; }
+
+  const body = { amount, type, category, date, notes: notes || null };
+  const btn  = document.getElementById('saveTxBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  const res = editingTxId
+    ? await apiFetch(`/transactions/${editingTxId}`, { method: 'PATCH', body: JSON.stringify(body) })
+    : await apiFetch('/transactions', { method: 'POST', body: JSON.stringify(body) });
+
+  btn.disabled = false;
+  btn.textContent = editingTxId ? 'Update Transaction' : 'Save Transaction';
+
+  if (!res) return;
+
+  if (res.ok) {
+    toast(editingTxId ? 'Transaction updated!' : 'Transaction added!', 'success');
+    closeModal('txModal');
+    loadTransactions();
+    loadOverview();
+  } else {
+    const err = await res.json();
+    toast(err.detail || 'Something went wrong', 'error');
+  }
+}
+
+/* ── DELETE TRANSACTION ── */
+function openDeleteTx(id, category, amount, type) {
+  deletingTxId = id;
+  document.getElementById('deleteDetails').innerHTML = `
+    <strong>Category:</strong> ${category}<br>
+    <strong>Amount:</strong> ${fmt(amount)}<br>
+    <strong>Type:</strong> ${type}
+  `;
+  showModal('deleteModal');
+}
+
+async function confirmDelete() {
+  const res = await apiFetch(`/transactions/${deletingTxId}`, { method: 'DELETE' });
+  if (res && res.ok) {
+    toast('Transaction deleted', 'success');
+    closeModal('deleteModal');
+    loadTransactions();
+    loadOverview();
+  } else {
+    toast('Could not delete transaction', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════
+   ANALYTICS
+══════════════════════════════════════════ */
+async function loadAnalytics() {
+  const container = document.getElementById('analyticsContent');
+
+  if (!['analyst','admin'].includes(currentUser.role)) {
+    container.innerHTML = `
+      <div class="access-denied">
+        <div class="lock">🔒</div>
+        <h3>Analyst Access Required</h3>
+        <p>You need Analyst or Admin role to view detailed analytics.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="loading-state">Loading analytics...</div>`;
+
+  const [catRes, monthRes] = await Promise.all([
+    apiFetch('/analytics/category-breakdown'),
+    apiFetch('/analytics/monthly')
+  ]);
+
+  if (!catRes || !monthRes) return;
+
+  const catData   = catRes.ok   ? await catRes.json()   : [];
+  const monthData = monthRes.ok ? await monthRes.json() : [];
+
+  const maxMonthIncome  = Math.max(...monthData.map(m => m.income), 1);
+  const maxMonthExpense = Math.max(...monthData.map(m => m.expense), 1);
+
+  container.innerHTML = `
+    <div class="analytics-grid">
+
+      <!-- Category Breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Category Breakdown</div>
+          <select onchange="reloadCatBreakdown(this.value)" style="font-family:'DM Mono',monospace;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--cream)">
+            <option value="">All</option>
+            <option value="income">Income only</option>
+            <option value="expense">Expense only</option>
+          </select>
+        </div>
+        <div class="card-body" id="catBreakdownBody">
+          ${catData.length ? catData.map(c => `
+            <div class="category-bar">
+              <div class="category-bar-label">
+                <span class="category-bar-name">${c.category}</span>
+                <span class="category-bar-pct">${fmt(c.total)} · ${c.percentage}%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:${c.percentage}%"></div>
+              </div>
+            </div>
+          `).join('') : '<div class="empty-state"><p>No data yet</p></div>'}
+        </div>
+      </div>
+
+      <!-- Monthly Totals -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Monthly Trends</div>
+        </div>
+        <div class="card-body">
+          ${monthData.length ? monthData.map(m => `
+            <div class="month-row">
+              <div class="month-label">${m.month}</div>
+              <div class="month-bars">
+                <div class="month-bar-row">
+                  <span style="font-size:10px;color:var(--sage);width:14px">↑</span>
+                  <div class="month-bar-track">
+                    <div class="bar-fill income" style="width:${(m.income/maxMonthIncome)*100}%"></div>
+                  </div>
+                  <div class="month-bar-val inc">${fmt(m.income)}</div>
+                </div>
+                <div class="month-bar-row">
+                  <span style="font-size:10px;color:var(--rust);width:14px">↓</span>
+                  <div class="month-bar-track">
+                    <div class="bar-fill expense" style="width:${(m.expense/maxMonthExpense)*100}%"></div>
+                  </div>
+                  <div class="month-bar-val exp">${fmt(m.expense)}</div>
+                </div>
+              </div>
+            </div>
+          `).join('') : '<div class="empty-state"><p>No monthly data yet</p></div>'}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Net by Month Table -->
+    ${monthData.length ? `
+    <div class="card">
+      <div class="card-header"><div class="card-title">Monthly Net Summary</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Income</th>
+              <th>Expenses</th>
+              <th>Net Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${monthData.map(m => `
+              <tr>
+                <td>${m.month}</td>
+                <td class="tx-income">${fmt(m.income)}</td>
+                <td class="tx-expense">${fmt(m.expense)}</td>
+                <td class="${m.net >= 0 ? 'net-positive' : 'net-negative'}">${m.net >= 0 ? '+' : ''}${fmt(m.net)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+async function reloadCatBreakdown(type) {
+  const url = type ? `/analytics/category-breakdown?type=${type}` : '/analytics/category-breakdown';
+  const res = await apiFetch(url);
+  if (!res || !res.ok) return;
+  const catData = await res.json();
+
+  document.getElementById('catBreakdownBody').innerHTML = catData.length
+    ? catData.map(c => `
+        <div class="category-bar">
+          <div class="category-bar-label">
+            <span class="category-bar-name">${c.category}</span>
+            <span class="category-bar-pct">${fmt(c.total)} · ${c.percentage}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill ${type || ''}" style="width:${c.percentage}%"></div>
+          </div>
+        </div>
+      `).join('')
+    : '<div class="empty-state"><p>No data for this filter</p></div>';
+}
+
+/* ══════════════════════════════════════════
+   USERS (Admin only)
+══════════════════════════════════════════ */
+async function loadUsers() {
+  const container = document.getElementById('usersContent');
+
+  if (currentUser.role !== 'admin') {
+    container.innerHTML = `
+      <div class="access-denied">
+        <div class="lock">🔒</div>
+        <h3>Admin Access Required</h3>
+        <p>Only administrators can manage users.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = '<div class="loading-state">Loading users...</div>';
+
+  const res = await apiFetch('/auth/users');
+  if (!res || !res.ok) return;
+  const users = await res.json();
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">All Users (${users.length})</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(u => `
+              <tr>
+                <td style="color:var(--muted);font-size:12px">#${u.id}</td>
+                <td>${u.name}</td>
+                <td style="font-size:12px;color:var(--muted)">${u.email}</td>
+                <td><span class="role-badge badge-${u.role}">${u.role}</span></td>
+                <td style="font-size:12px;color:var(--muted)">${fmtDate(u.created_at)}</td>
+                <td>
+                  ${u.id === currentUser.id
+                    ? '<span style="font-size:11px;color:var(--muted)">You</span>'
+                    : `
+                      <div class="action-btns">
+                        <select class="user-role-select" onchange="updateUserRole(${u.id}, this.value)">
+                          <option ${u.role==='viewer'?'selected':''}>viewer</option>
+                          <option ${u.role==='analyst'?'selected':''}>analyst</option>
+                          <option ${u.role==='admin'?'selected':''}>admin</option>
+                        </select>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${u.name}')">Del</button>
+                      </div>
+                    `
+                  }
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function updateUserRole(userId, newRole) {
+  const res = await apiFetch(`/auth/users/${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role: newRole })
+  });
+  if (res && res.ok) {
+    toast(`Role updated to ${newRole}`, 'success');
+  } else {
+    toast('Failed to update role', 'error');
+  }
+}
+
+async function deleteUser(userId, name) {
+  if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+  const res = await apiFetch(`/auth/users/${userId}`, { method: 'DELETE' });
+  if (res && res.ok) {
+    toast('User deleted', 'success');
+    loadUsers();
+  } else {
+    toast('Failed to delete user', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+window.onload = () => {
+  if (token && currentUser) {
+    document.getElementById('loginScreen').classList.remove('active');
+    document.getElementById('dashScreen').classList.add('active');
+    enterDashboard();
+  }
+};
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
